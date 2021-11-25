@@ -16,15 +16,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="serif-monospace"
-            android:text="Aes\nEncryption"
+            android:text="Aes Encryption"
             android:textAlignment="center"
             android:textColor="@color/white"
-            android:textSize="50sp"
+            android:textSize="30sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias=".1" />
+            app:layout_constraintVertical_bias="0" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/textInputLayout"
@@ -38,7 +38,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvTitle"
-            app:layout_constraintVertical_bias=".1"
+            app:layout_constraintVertical_bias=".05"
             app:startIconDrawable="@drawable/ic_lock"
             app:startIconTint="@color/teal_200">
 
@@ -55,9 +55,54 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <EditText
+            android:id="@+id/edtKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:background="@color/dark_blue"
+            android:drawableEnd="@drawable/ic_restore"
+            android:gravity="start"
+            android:hint="Key..."
+            android:drawablePadding="4dp"
+            android:inputType="text"
+            android:letterSpacing="0.1"
+            android:padding="20dp"
+            android:textColor="@color/white"
+            android:textColorHint="@color/dark_grey"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/textInputLayout"
+            app:layout_constraintStart_toStartOf="@+id/textInputLayout"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout"
+            app:layout_constraintVertical_bias="0" />
+
+        <EditText
+            android:drawablePadding="4dp"
+            android:id="@+id/edtIv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:background="@color/dark_blue"
+            android:drawableEnd="@drawable/ic_restore"
+            android:gravity="start"
+            android:hint="Iv..."
+            android:inputType="text"
+            android:letterSpacing="0.1"
+            android:padding="20dp"
+            android:textColor="@color/white"
+            android:textColorHint="@color/dark_grey"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/edtKey"
+            app:layout_constraintStart_toStartOf="@+id/edtKey"
+            app:layout_constraintTop_toBottomOf="@+id/edtKey"
+            app:layout_constraintVertical_bias="0" />
+
+        <EditText
             android:id="@+id/plainText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
             android:background="@color/dark_blue"
             android:gravity="start"
             android:hint="Text...."
@@ -69,10 +114,10 @@
             android:textColorHint="@color/dark_grey"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@+id/textInputLayout"
-            app:layout_constraintStart_toStartOf="@+id/textInputLayout"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout"
-            app:layout_constraintVertical_bias=".1" />
+            app:layout_constraintEnd_toEndOf="@+id/edtIv"
+            app:layout_constraintStart_toStartOf="@+id/edtIv"
+            app:layout_constraintTop_toBottomOf="@+id/edtIv"
+            app:layout_constraintVertical_bias="0" />
 
         <Button
             android:id="@+id/buttonGenerate"

@@ -1,9 +1,15 @@
 package com.devapp.aesencryptionjava.fragments;
 
+import android.annotation.SuppressLint;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -15,17 +21,24 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
 
 import com.devapp.aesencryptionjava.R;
+import com.devapp.aesencryptionjava.model.Result;
+import com.devapp.aesencryptionjava.util.Encryption;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.util.Base64;
 import java.util.Objects;
 
 public class FragmentEncryption extends Fragment {
+    private final String TAG = "FragmentEncryption";
     private AutoCompleteTextView autoCompleteTextView;
     private Button generateButton;
     private ImageView imgSuccess;
@@ -33,8 +46,11 @@ public class FragmentEncryption extends Fragment {
     private TextView titleText;
     private TextInputLayout textInputLayout;
     private EditText plainText;
+    private EditText edtKey;
+    private EditText edtIv;
     private Handler handler = new Handler(Looper.getMainLooper());
-    public FragmentEncryption(){
+
+    public FragmentEncryption() {
 
     }
 
@@ -46,34 +62,125 @@ public class FragmentEncryption extends Fragment {
 
     @Override
     public void onResume() {
-        String [] aesString = getResources().getStringArray(R.array.aes_algorithms);
-        ArrayAdapter arrayAdapter = new ArrayAdapter(requireContext(),R.layout.item_drop_down,aesString);
+        if (autoCompleteTextView.getText().toString().contains("CBC")) {
+            edtIv.setVisibility(View.VISIBLE);
+        } else {
+            edtIv.setVisibility(View.GONE);
+        }
+        String[] aesString = getResources().getStringArray(R.array.aes_algorithms);
+        ArrayAdapter arrayAdapter = new ArrayAdapter(requireContext(), R.layout.item_drop_down, aesString);
         autoCompleteTextView.setAdapter(arrayAdapter);
+        autoCompleteTextView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if (editable.toString().contains("CBC")) {
+                    edtIv.setVisibility(View.VISIBLE);
+                } else {
+                    edtIv.setVisibility(View.GONE);
+                }
+            }
+        });
         super.onResume();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         mapping(view);
+
         autoCompleteTextView.setFocusable(false);
+
         generateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(plainText.getText().toString().trim().isEmpty()){
-                    showSnackbar("Plain text must not empty");
+                if (plainText.getText().toString().trim().isEmpty() || edtKey.getText().toString().trim().isEmpty()) {
+                    showSnackbar("Fields must not empty");
+                } else {
+                    try {
+                        if (edtIv.getVisibility() == View.VISIBLE) {
+                            if (edtIv.getText().toString().isEmpty()) {
+                                showSnackbar("Fields must not empty");
+                            } else {
+                                try {
+                                    Result r = Encryption.CBCEncryptionWithKey(plainText.getText().toString(), edtKey.getText().toString(), edtIv.getText().toString());
+                                    applyAnimation(r);
+                                } catch (Exception e) {
+                                    showSnackbar(e.getMessage());
+                                }
+                            }
+                        } else {
+                            try {
+                                Result r = Encryption.ECBEncryptionWithKey(plainText.getText().toString(), edtKey.getText().toString());
+                                applyAnimation(r);
+                            } catch (Exception e) {
+                                showSnackbar(e.getMessage());
+                            }
+                        }
+                    } catch (Exception e) {
+                        showSnackbar(e.getMessage());
+                    }
                 }
-                else applyAnimation();
+                ;
             }
+        });
+
+        edtKey.setOnTouchListener((v, event) -> {
+            final int DRAWABLE_LEFT = 0;
+            final int DRAWABLE_TOP = 1;
+            final int DRAWABLE_RIGHT = 2;
+            final int DRAWABLE_BOTTOM = 3;
+
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                if (event.getRawX() >= (edtKey.getRight() - edtKey.getPaddingEnd() - edtKey.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                    edtKey.setText(Base64.getEncoder().encodeToString(Encryption.makeRandomKey()));
+                    return true;
+                }
+            }
+            return false;
+        });
+
+        edtIv.setOnTouchListener((v, event) -> {
+            final int DRAWABLE_LEFT = 0;
+            final int DRAWABLE_TOP = 1;
+            final int DRAWABLE_RIGHT = 2;
+            final int DRAWABLE_BOTTOM = 3;
+
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                if (event.getRawX() >= (edtIv.getRight() - edtIv.getPaddingEnd() - edtIv.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                    edtIv.setText(Base64.getEncoder().encodeToString(Encryption.makeRandomIv()));
+                    return true;
+                }
+            }
+            return false;
         });
 
         super.onViewCreated(view, savedInstanceState);
     }
 
-    private void applyAnimation(){
+    private void applyAnimation(Result result) {
         generateButton.setEnabled(false);
         titleText.animate().alpha(0).setDuration(400);
         generateButton.animate().alpha(0).setDuration(400);
         textInputLayout.animate()
+                .alpha(0f)
+                .translationXBy(1200f)
+                .setDuration(400);
+        edtKey.animate()
+                .alpha(0f)
+                .translationXBy(-1200f)
+                .setDuration(400);
+        edtIv.animate()
                 .alpha(0f)
                 .translationXBy(1200f)
                 .setDuration(400);
@@ -87,19 +194,21 @@ public class FragmentEncryption extends Fragment {
             viewSuccess.animate().rotationBy(720f).setDuration(600);
             viewSuccess.animate().scaleXBy(900f).setDuration(600);
             viewSuccess.animate().scaleYBy(900f).setDuration(600);
-        },300);
+        }, 300);
 
         handler.postDelayed(() -> {
             imgSuccess.animate().alpha(1f).setDuration(1000);
-        },800);
+        }, 800);
 
         handler.postDelayed(() -> {
-            Navigation.findNavController(requireView()).navigate(R.id.action_menuEncryption_to_fragmentSuccess);
-        },2000);
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("data",result);
+            Navigation.findNavController(requireView()).navigate(R.id.action_menuEncryption_to_fragmentSuccess,bundle);
+        }, 2000);
     }
 
-    private void showSnackbar(String message){
-        Snackbar snackbar = Snackbar.make(requireView(),message,Snackbar.LENGTH_LONG);
+    private void showSnackbar(String message) {
+        Snackbar snackbar = Snackbar.make(requireView(), message, Snackbar.LENGTH_LONG);
         snackbar.setAction("OKAY", new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -109,7 +218,7 @@ public class FragmentEncryption extends Fragment {
         snackbar.show();
     }
 
-    private void mapping(View view){
+    private void mapping(View view) {
         autoCompleteTextView = view.findViewById(R.id.autoCompleView);
         generateButton = view.findViewById(R.id.buttonGenerate);
         viewSuccess = view.findViewById(R.id.successHandle);
@@ -117,5 +226,7 @@ public class FragmentEncryption extends Fragment {
         titleText = view.findViewById(R.id.tvTitle);
         textInputLayout = view.findViewById(R.id.textInputLayout);
         plainText = view.findViewById(R.id.plainText);
+        edtKey = view.findViewById(R.id.edtKey);
+        edtIv = view.findViewById(R.id.edtIv);
     }
 }

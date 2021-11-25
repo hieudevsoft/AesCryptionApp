@@ -8,8 +8,4 @@
         android:id="@+id/menuDecryption"
         android:title="Aes Decryption"
         android:icon="@drawable/ic_baseline_key_off_24"/>
-    <item
-        android:id="@+id/menuDiffBit"
-        android:title="Compare bits"
-        android:icon="@drawable/ic_baseline_compare_arrows_24"/>
 </menu>

@@ -16,10 +16,6 @@
             app:popExitAnim="@anim/to_bottom" />
     </fragment>
     <fragment
-        android:id="@+id/menuDiffBit"
-        android:name="com.devapp.aesencryptionjava.fragments.FragmentDiff"
-        android:label="Aes Compare" />
-    <fragment
         android:id="@+id/menuEncryption"
         android:name="com.devapp.aesencryptionjava.fragments.FragmentEncryption"
         android:label="Aes Encryption" >
@@ -34,5 +30,11 @@
     <fragment
         android:id="@+id/fragmentSuccess"
         android:name="com.devapp.aesencryptionjava.fragments.FragmentSuccess"
-        android:label="Success" />
+        android:label="Success" >
+        <argument
+            android:name="data"
+            app:argType="com.devapp.aesencryptionjava.model.Result"
+            app:nullable="true"
+            android:defaultValue="@null" />
+    </fragment>
 </navigation>
