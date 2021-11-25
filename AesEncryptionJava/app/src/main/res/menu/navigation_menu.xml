@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menuEncryption"
+        android:title="Aes Encryption"
+        android:icon="@drawable/ic_encryption"/>
+    <item
+        android:id="@+id/menuDecryption"
+        android:title="Aes Decryption"
+        android:icon="@drawable/ic_baseline_key_off_24"/>
+    <item
+        android:id="@+id/menuDiffBit"
+        android:title="Compare bits"
+        android:icon="@drawable/ic_baseline_compare_arrows_24"/>
+</menu>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_host"
+    app:startDestination="@id/menuEncryption">
+    <fragment
+        android:id="@+id/menuDecryption"
+        android:name="com.devapp.aesencryptionjava.fragments.FragmentDecryption"
+        android:label="Aes Decryption" >
+        <action
+            android:id="@+id/action_menuDecryption_to_fragmentSuccess"
+            app:destination="@id/fragmentSuccess"
+            app:enterAnim="@anim/from_bottom"
+            app:exitAnim="@anim/to_top"
+            app:popEnterAnim="@anim/from_top"
+            app:popExitAnim="@anim/to_bottom" />
+    </fragment>
+    <fragment
+        android:id="@+id/menuDiffBit"
+        android:name="com.devapp.aesencryptionjava.fragments.FragmentDiff"
+        android:label="Aes Compare" />
+    <fragment
+        android:id="@+id/menuEncryption"
+        android:name="com.devapp.aesencryptionjava.fragments.FragmentEncryption"
+        android:label="Aes Encryption" >
+        <action
+            android:id="@+id/action_menuEncryption_to_fragmentSuccess"
+            app:destination="@id/fragmentSuccess"
+            app:enterAnim="@anim/from_bottom"
+            app:exitAnim="@anim/to_top"
+            app:popEnterAnim="@anim/from_top"
+            app:popExitAnim="@anim/to_bottom" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragmentSuccess"
+        android:name="com.devapp.aesencryptionjava.fragments.FragmentSuccess"
+        android:label="Success" />
+</navigation>
