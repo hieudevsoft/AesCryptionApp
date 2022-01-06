@@ -28,6 +28,7 @@ import androidx.navigation.Navigation;
 import com.devapp.aesencryptionjava.R;
 import com.devapp.aesencryptionjava.model.Result;
 import com.devapp.aesencryptionjava.util.Encryption;
+import com.devapp.aesencryptionjava.util.SharedPrefs;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -45,7 +46,7 @@ public class FragmentDecryption extends Fragment {
     private EditText edtKey;
     private EditText edtIv;
     private Handler handler = new Handler(Looper.getMainLooper());
-
+    private SharedPrefs prefs;
     public FragmentDecryption() {
 
     }
@@ -53,6 +54,7 @@ public class FragmentDecryption extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        prefs = new SharedPrefs(requireContext());
         return inflater.inflate(R.layout.fragment_decryption, container, false);
     }
 
@@ -86,6 +88,8 @@ public class FragmentDecryption extends Fragment {
                 }
             }
         });
+        edtIv.setText(prefs.getIv());
+        edtKey.setText(prefs.getKey());
         super.onResume();
     }
 
@@ -134,6 +138,8 @@ public class FragmentDecryption extends Fragment {
     }
 
     private void applyAnimation(Result result) {
+        prefs.saveKey(prefs.getKey());
+        prefs.saveIv(prefs.getIv());
         generateButton.setEnabled(false);
         titleText.animate().alpha(0).setDuration(400);
         generateButton.animate().alpha(0).setDuration(400);

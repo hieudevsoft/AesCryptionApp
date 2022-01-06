@@ -31,6 +31,7 @@ import androidx.navigation.ui.NavigationUI;
 import com.devapp.aesencryptionjava.R;
 import com.devapp.aesencryptionjava.model.Result;
 import com.devapp.aesencryptionjava.util.Encryption;
+import com.devapp.aesencryptionjava.util.SharedPrefs;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -49,7 +50,7 @@ public class FragmentEncryption extends Fragment {
     private EditText edtKey;
     private EditText edtIv;
     private Handler handler = new Handler(Looper.getMainLooper());
-
+    private SharedPrefs prefs;
     public FragmentEncryption() {
 
     }
@@ -57,6 +58,7 @@ public class FragmentEncryption extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        prefs = new SharedPrefs(requireContext());
         return inflater.inflate(R.layout.fragment_encryption, container, false);
     }
 
@@ -90,6 +92,8 @@ public class FragmentEncryption extends Fragment {
                 }
             }
         });
+        edtIv.setText(prefs.getIv());
+        edtKey.setText(prefs.getKey());
         super.onResume();
     }
 
@@ -101,38 +105,35 @@ public class FragmentEncryption extends Fragment {
 
         autoCompleteTextView.setFocusable(false);
 
-        generateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (plainText.getText().toString().trim().isEmpty() || edtKey.getText().toString().trim().isEmpty()) {
-                    showSnackbar("Fields must not empty");
-                } else {
-                    try {
-                        if (edtIv.getVisibility() == View.VISIBLE) {
-                            if (edtIv.getText().toString().isEmpty()) {
-                                showSnackbar("Fields must not empty");
-                            } else {
-                                try {
-                                    Result r = Encryption.CBCEncryptionWithKey(plainText.getText().toString(), edtKey.getText().toString(), edtIv.getText().toString());
-                                    applyAnimation(r);
-                                } catch (Exception e) {
-                                    showSnackbar(e.getMessage());
-                                }
-                            }
+        generateButton.setOnClickListener(v -> {
+            if (plainText.getText().toString().trim().isEmpty() || edtKey.getText().toString().trim().isEmpty()) {
+                showSnackbar("Fields must not empty");
+            } else {
+                try {
+                    if (edtIv.getVisibility() == View.VISIBLE) {
+                        if (edtIv.getText().toString().isEmpty()) {
+                            showSnackbar("Fields must not empty");
                         } else {
                             try {
-                                Result r = Encryption.ECBEncryptionWithKey(plainText.getText().toString(), edtKey.getText().toString());
+                                Result r = Encryption.CBCEncryptionWithKey(plainText.getText().toString(), edtKey.getText().toString(), edtIv.getText().toString());
                                 applyAnimation(r);
                             } catch (Exception e) {
                                 showSnackbar(e.getMessage());
                             }
                         }
-                    } catch (Exception e) {
-                        showSnackbar(e.getMessage());
+                    } else {
+                        try {
+                            Result r = Encryption.ECBEncryptionWithKey(plainText.getText().toString(), edtKey.getText().toString());
+                            applyAnimation(r);
+                        } catch (Exception e) {
+                            showSnackbar(e.getMessage());
+                        }
                     }
+                } catch (Exception e) {
+                    showSnackbar(e.getMessage());
                 }
-                ;
             }
+            ;
         });
 
         edtKey.setOnTouchListener((v, event) -> {
@@ -169,6 +170,8 @@ public class FragmentEncryption extends Fragment {
     }
 
     private void applyAnimation(Result result) {
+        prefs.saveIv(edtIv.getText().toString().trim());
+        prefs.saveKey(edtKey.getText().toString().trim());
         generateButton.setEnabled(false);
         titleText.animate().alpha(0).setDuration(400);
         generateButton.animate().alpha(0).setDuration(400);

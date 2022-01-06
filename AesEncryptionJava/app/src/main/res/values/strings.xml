@@ -5,6 +5,6 @@
 
     <string-array name="aes_algorithms">
         <item>AES - CBC</item>
-        <item>AES - EBC</item>
+        <item>AES - ECB</item>
     </string-array>
 </resources>
